@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'querystring-es3';
 import io from 'socket.io-client';
 import '../style/chat.css';
+import { SERVER_URL } from '../config';
 
 let socket;
 
@@ -19,22 +20,19 @@ const Chat = () => {
 
   const messagesEndRef = useRef(null);
   
-  // Scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Initialize connection
   useEffect(() => {
     if (!name || !room) {
       navigate('/');
       return;
     }
 
-    socket = io('http://localhost:5000');
+    socket = io(SERVER_URL);
     setConnected(true);
 
-    // Handle connection error
     socket.on('connect_error', () => {
       setError('Failed to connect to server');
       setConnected(false);
@@ -48,7 +46,7 @@ const Chat = () => {
       socket.disconnect();
       socket.off();
     }
-  }, ['http://localhost:5000', name, room, navigate]);
+  }, [name, room, navigate]);
 
   
   useEffect(() => {
@@ -59,12 +57,18 @@ const Chat = () => {
       scrollToBottom();
     });
 
+    socket.on('messageHistory', (messages) => {
+      setMessages(messages);
+      scrollToBottom();
+    });
+
     socket.on('roomData', ({ users }) => {
       setUsers(users);
     });
 
     return () => {
       socket.off('message');
+      socket.off('messageHistory');
       socket.off('roomData');
     };
   }, []);

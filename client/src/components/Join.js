@@ -84,14 +84,14 @@ export default function Join() {
           <div className="rooms-container">
             <label>Or select an active room:</label>
             <div className="active-rooms">
-              {rooms.map((activeRoom, index) => (
+              {rooms.map((roomName, index) => (
                 <button 
                   key={index}
                   type="button"
-                  className={`room-button ${room === activeRoom ? 'selected' : ''}`}
-                  onClick={() => handleRoomSelection(activeRoom)}
+                  className={`room-button ${room === roomName ? 'selected' : ''}`}
+                  onClick={() => handleRoomSelection(roomName)}
                 >
-                  {activeRoom}
+                  {roomName}
                 </button>
               ))}
             </div>
